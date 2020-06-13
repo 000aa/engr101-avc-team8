@@ -1,58 +1,130 @@
 #include "robot.hpp"
 
-class Image{
+class Image {
 	
 	private:
 	
+		struct line{ // a white line in the image that the robot needs to be aware of (eg to follow)
+			int location, error;
+			bool found;
+		};
+		
+		struct sensor{ // an imaginary line that can detect white pixels in the image
+			int position;
+			bool horizontal;
+		};
+		
+		struct pixels{ // information we might want to know about white pixels found by a sensor
+			int count, totalLocation, averageLocation;
+		};
+	
 		int middleRow, middleColumn;
-		
-		int whitePixelsFound;
-		int sumWhitePixelColumns; // this variable will sum together the column numbers of each white pixel, so that an average can be found.
-		int whiteLineLocation; // this variable will store the average column (ie location) for white pixels.
-		
+				
 		ImagePPM currentImage;
+		
+		sensor lineAhead; // define some sensors where we want to detect white pixels in the image
+		sensor lineLeft;
+		sensor lineRight;
+		
+		/**
+		 * Finds count, total location (sum of location indexes), and average location of white pixels on sensor.
+		 */
+		pixels findPixels(sensor activeSensor) {
+			
+			pixels pixelsFound;
+			pixelsFound.count = 0;
+			pixelsFound.totalLocation = 0;
+			int size; // this will be used in the below for loop to check each "location" (pixel) along the sensor
+			
+			if (activeSensor.horizontal) {
+				pixelsFound.averageLocation = middleColumn;
+				size = currentImage.width;
+			}
+			else {
+				pixelsFound.averageLocation = middleRow;
+				size = currentImage.height;
+			}
+			
+			for (int locations = 0; locations < size; locations++) { // loop through all "locations" (pixels) along the sensor
+				int pixelLuminosity = 0;
+				if (activeSensor.horizontal) {
+					pixelLuminosity = get_pixel(currentImage, activeSensor.position, locations, 3);
+				}
+				else {
+					pixelLuminosity = get_pixel(currentImage, locations, activeSensor.position, 3);
+				}
+				bool pixelIsWhite = pixelLuminosity > 250; // find out if the pixel is white
+				if (pixelIsWhite) {
+					pixelsFound.totalLocation = pixelsFound.totalLocation + locations; // add location checked to "total" location
+					pixelsFound.count++;
+				}
+			}
+			
+			if (pixelsFound.count > 0) { // did we actually find any white pixels?
+				pixelsFound.averageLocation = pixelsFound.totalLocation / pixelsFound.count; // find the average location for white pixels
+			}
+			
+			return pixelsFound;
+		}
+		 
+		
+		/**
+		 * Finds the location of the white line.
+		 */
+		line findLine(sensor activeSensor) {
+
+			pixels pixelsFound = findPixels(activeSensor); // find the pixels detected by this sensor
+			line lineFound;
+			
+			lineFound.location = pixelsFound.averageLocation; // determine the location of the white line
+			
+			if (activeSensor.horizontal) { // determine the error of the white line from the center of the sensor
+				lineFound.error = lineFound.location - middleColumn;
+			}
+			else {
+				lineFound.error = lineFound.location - middleRow;
+			}
+			
+			if (pixelsFound.count > 0) { // also determine if there is actually a line there
+				lineFound.found = true;
+			}
+			else {
+				lineFound.found = false;
+			}
+			
+			return lineFound;
+		}
 		
 	public:
 		
-	Image() {
-		takePicture();
-		currentImage = cameraView;
-		
-		middleRow = cameraView.height / 2;
-		middleColumn = cameraView.width / 2;
-		
-		whitePixelsFound = 0;
-		sumWhitePixelColumns = 0;
-	}
-
-	int getWhiteLineLocation() { // finds the column location of the white line.
-
-		for (int columns = 0; columns < currentImage.width; columns++) { // loop through all columns of the image
-			int pixelLuminosity = get_pixel(currentImage, middleRow, columns, 3);
-			bool pixelIsWhite = pixelLuminosity > 250; // find out if the pixel is white
-			if (pixelIsWhite) {
-				sumWhitePixelColumns = sumWhitePixelColumns + columns; // add column number to sum of column numbers
-				whitePixelsFound++;
-			}
+		Image() {
+			takePicture();
+			currentImage = cameraView;
+			
+			middleRow = cameraView.height / 2;
+			middleColumn = cameraView.width / 2;
+			
+			lineAhead.position = middleRow; // each sensor already has a horizontal/vertical orientation, now give them positions.
+			lineAhead.horizontal = true;
+			
+			lineLeft.position = 2;
+			lineLeft.horizontal = false;
+			
+			lineRight.position = currentImage.width - 2;
+			lineRight.horizontal = false;
 		}
 		
-		if (whitePixelsFound > 0) { // did we actually find any white pixels?
-			whiteLineLocation = sumWhitePixelColumns / whitePixelsFound; // find the average column for white pixels
-			return whiteLineLocation;
+		/**
+		 * Return the lines found to the rest of the program
+		 */
+		line getLineAhead() {
+			return findLine(lineAhead);
 		}
-		else { // as a default, return the middle column
-			return middleColumn;
+		line getLineLeft() {
+			return findLine(lineLeft);
 		}
-		
-	}
-
-	int getError() { // calculates and returns the error between the white line and the center of the image.
-		
-		int error = getWhiteLineLocation() - middleColumn;
-		std::cout<<error<<std::endl;
-		return error;
-		return error;
-		
-	}
+		line getLineRight() {
+			return findLine(lineRight);
+		}
 
 };
