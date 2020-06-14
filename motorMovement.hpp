@@ -3,16 +3,18 @@
 
 class Motor{
 	private:
+  
 	double defSpeed = 25.0;
-    
     
     public:
     double vLeft;
     double vRight;
+
     Motor(){
 	  setMotors(defSpeed,defSpeed);   
 	}
 	
+
  void followLine(int error) {
 	 double speedUp = 0.0;
 	 if(abs(error) < 2){
@@ -25,12 +27,14 @@ class Motor{
     std::cout<<" vLeft="<<vLeft<<"  vRight="<<vRight<<std::endl;
     
 }
+  
  void turnLeft(){
 	 vRight = 15;
 	 vLeft = 0;
 	 setMotors(vLeft,vRight);   
      std::cout<<" vLeft="<<vLeft<<"  vRight="<<vRight<<std::endl;
  }
+  
  void turnRight(){
 	 vRight = 0;
 	 vLeft = 15;
