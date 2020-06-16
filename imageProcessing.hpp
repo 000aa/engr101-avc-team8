@@ -25,6 +25,7 @@ class Image {
 		sensor lineAhead; // define some sensors where we want to detect white pixels in the image
 		sensor lineLeft;
 		sensor lineRight;
+		sensor lineBottom;
 		
 		/**
 		 * Finds count, total location (sum of location indexes), and average location of white pixels on sensor.
@@ -63,7 +64,7 @@ class Image {
 			if (pixelsFound.count > 0) { // did we actually find any white pixels?
 				pixelsFound.averageLocation = pixelsFound.totalLocation / pixelsFound.count; // find the average location for white pixels
 			}
-			
+						
 			return pixelsFound;
 		}
 		 
@@ -93,6 +94,7 @@ class Image {
 			}
 			
 			return lineFound;
+			
 		}
 		
 	public:
@@ -104,8 +106,11 @@ class Image {
 			middleRow = cameraView.height / 2;
 			middleColumn = cameraView.width / 2;
 			
-			lineAhead.position = middleRow; // each sensor already has a horizontal/vertical orientation, now give them positions.
+			lineAhead.position = middleRow; // initialise sensors
 			lineAhead.horizontal = true;
+			
+			lineBottom.position = currentImage.height - 2;
+			lineBottom.horizontal = true;
 			
 			lineLeft.position = 2;
 			lineLeft.horizontal = false;
@@ -126,5 +131,15 @@ class Image {
 		line getLineRight() {
 			return findLine(lineRight);
 		}
+		line getLineBottom() {
+			return findLine(lineBottom);
+		}
+		
+		/**
+		 * Returns other useful variables
+		 */
+		 ImagePPM getCurrentImage() {
+			 return currentImage;
+		 }
 
 };
