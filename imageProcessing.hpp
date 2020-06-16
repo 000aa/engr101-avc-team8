@@ -53,6 +53,7 @@ class Image {
 				else {
 					pixelLuminosity = get_pixel(currentImage, locations, activeSensor.position, 3);
 				}
+				std::cout<<"pixelLuminosity"<<pixelLuminosity<<std::endl;
 				bool pixelIsWhite = pixelLuminosity > 250; // find out if the pixel is white
 				if (pixelIsWhite) {
 					pixelsFound.totalLocation = pixelsFound.totalLocation + locations; // add location checked to "total" location
@@ -63,7 +64,7 @@ class Image {
 			if (pixelsFound.count > 0) { // did we actually find any white pixels?
 				pixelsFound.averageLocation = pixelsFound.totalLocation / pixelsFound.count; // find the average location for white pixels
 			}
-			
+			std::cout<<"pixelsFound="<<pixelsFound.count<<std::endl;
 			return pixelsFound;
 		}
 		 
@@ -99,6 +100,7 @@ class Image {
 		
 		Image() {
 			takePicture();
+			std::cout<<"pixel="<<(int)get_pixel(cameraView,10,10,3)<<" ";
 			currentImage = cameraView;
 			
 			middleRow = cameraView.height / 2;
