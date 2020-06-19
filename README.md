@@ -1,3 +1,30 @@
+# Installation Instructions
+
+## macOS Catalina
+
+Follow the instructions below to install the software on macOS Catalina.
+
+### Install the SFML gaming library
+
+The software depends on the SFML gaming library, so this must be installed first.
+
+1. Ensure Xcode is up to date. From the Apple menu in the top right, open System Preferences > Software Update. If there is an update available for Command Line Tools for Xcode, install it.
+1. Open a new Terminal window.
+1. Intall Homebrew by pasting the following into the terminal window: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"`
+1. Once Homebrow is installed, paste the following into the terminal window to install the SFML gaming library: `brew install sfml`
+1. You may now close the Terminal window.
+
+### Download, make, and run the software
+
+1. Download the GitHub repository as .zip file.
+1. Extract the .zip file in a place of your choice. It will contain two folders: AVC_robot and AVC_server.
+1. Open two new Terminal windows: one in the AVC_robot folder, and one in the AVC_server folder. If the two folders are in your home folder, you can open them in either of the Terminal windows by typing `cd AVC_robot` or `cd AVC_server`.
+1. Type `make` into both Terminal windows. This will use the makefile contained in each folder to create an executable file. The makefiles provided are ready to use, and do not need to be edited.
+1. Open config.txt from the AVC_server folder in a text editor of your choice to change the maze file to either core.txt, completion.txt, or challenge.txt. Save the file.
+1. In the Terminal window for the AVC_server folder, type `./server3` to start the server.
+1. In the Terminal window for the AVC_robot folder, type `./robot` to run the software.
+1. To change the maze file, close the software window, and press control-C in both Terminal windows. You can then repeat steps 5 - 7.
+
 # AVC Team Plan
 
 ## Team Members
